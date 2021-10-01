@@ -1,0 +1,16 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.194.3/containers/docker-existing-dockerfile
+{
+  "name": "Flutter in Docker",
+  "dockerFile": "./DOCKERFILE",
+  "build": {
+    "args": {
+      "ANDROID_SDK_ROOT": "/home/user/Android/sdk",
+      "USERNAME": "user"
+    }
+  },
+  "settings": {},
+  "extensions": ["dart-code.dart-code", "dart-code.flutter"],
+  "forwardPorts": [5554, 5555, 5556, 5557, 5558, 5559, 6000],
+  "remoteUser": "user"
+}

@@ -1,0 +1,36 @@
+FROM ubuntu:20.10 as builder
+
+ARG ANDROID_SDK_ROOT
+ARG USERNAME
+
+RUN apt update && apt install -y curl git unzip xz-utils zip libglu1-mesa openjdk-8-jdk wget
+RUN useradd -ms /bin/bash ${USERNAME}
+USER ${USERNAME}
+WORKDIR /home/${USERNAME}
+
+#Installing Android SDK
+RUN mkdir -p ${ANDROID_SDK_ROOT}
+ENV ANDROID_SDK_ROOT ${ANDROID_SDK_ROOT}
+RUN mkdir -p .android && touch .android/repositories.cfg
+RUN wget -O sdk-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip
+RUN unzip sdk-tools.zip && rm sdk-tools.zip
+RUN mkdir -p ${ANDROID_SDK_ROOT}/cmdline-tools/latest
+RUN mv cmdline-tools/* ${ANDROID_SDK_ROOT}/cmdline-tools/latest
+RUN cd ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin && yes | ./sdkmanager --licenses
+RUN cd ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin && ./sdkmanager "build-tools;30.0.3" "patcher;v4" "platform-tools" "platforms;android-30" "sources;android-30"
+ENV PATH "$PATH:$ANDROID_SDK_ROOT/platform-tools"
+ENV PATH "$PATH:$ANDROID_SDK_ROOT/emulator"
+ENV PATH "$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin"
+
+#Installing Flutter SDK
+RUN git clone https://github.com/flutter/flutter.git
+ENV PATH "$PATH:/home/${USERNAME}/flutter/bin"
+ENV FLUTTER_HOME "/home/${USERNAME}/flutter"
+RUN flutter channel stable
+RUN flutter config --no-analytics
+ENV SHELL /bin/bash
+RUN flutter upgrade
+RUN flutter doctor
+
+RUN flutter pub global activate at_app
+ENV PATH "$PATH:/home/${USERNAME}/.pub-cache/bin"
