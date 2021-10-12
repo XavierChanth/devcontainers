@@ -1,0 +1,17 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.194.3/containers/docker-existing-dockerfile
+{
+  "name": "Hugo in Docker",
+  "dockerFile": "./DOCKERFILE",
+  "build": {
+    "args": {
+      "BASE_IMAGE": "alpine:latest",
+      "USERNAME": "user",
+      "INSTALL_NODE": "true",
+      "DOCKER_HUGO_VERSION": "0.88.1"
+    }
+  },
+  "settings": {},
+  "forwardPorts": [],
+  "remoteUser": "user"
+}
