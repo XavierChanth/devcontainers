@@ -1,46 +1,27 @@
-ARG BASE_IMAGE
-FROM ${BASE_IMAGE} as builder
+ARG NODE_VERSION
+FROM mcr.microsoft.com/vscode/devcontainers/javascript-node:0-${NODE_VERSION}
+ARG VARIANT
+ARG VERSION
 
-ARG USERNAME
+# Download Hugo
+RUN apt-get update && apt-get install -y ca-certificates openssl git curl && \
+    rm -rf /var/lib/apt/lists/* && \
+    case ${VERSION} in \
+    latest) \
+    export VERSION=$(curl -s https://api.github.com/repos/gohugoio/hugo/releases/latest | grep "tag_name" | awk '{print substr($2, 3, length($2)-4)}') ;;\
+    esac && \
+    echo ${VERSION} && \
+    wget -O ${VERSION}.tar.gz https://github.com/gohugoio/hugo/releases/download/v${VERSION}/${VARIANT}_${VERSION}_Linux-64bit.tar.gz && \
+    tar xf ${VERSION}.tar.gz && \
+    mv hugo /usr/bin/hugo
 
-RUN apt-get update && apt-get install ${BASE_PACKAGES}
-RUN useradd -ms /bin/bash ${USERNAME}
+# Hugo dev server port
+EXPOSE 1313
 
-USER ${USERNAME}
-WORKDIR /home/${USERNAME}
+# [Optional] Uncomment this section to install additional OS packages you may want.
+#
+# RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+#     && apt-get -y install --no-install-recommends <your-package-list-here>
 
-ARG DOCKER_HUGO_VERSION
-ENV DOCKER_HUGO_NAME="hugo_extended_${DOCKER_HUGO_VERSION}_Linux-64bit"
-ENV DOCKER_HUGO_BASE_URL="https://github.com/gohugoio/hugo/releases/download"
-ENV DOCKER_HUGO_URL="${DOCKER_HUGO_BASE_URL}/v${DOCKER_HUGO_VERSION}/${DOCKER_HUGO_NAME}.tar.gz"
-ENV DOCKER_HUGO_CHECKSUM_URL="${DOCKER_HUGO_BASE_URL}/v${DOCKER_HUGO_VERSION}/hugo_${DOCKER_HUGO_VERSION}_checksums.txt"
-ARG INSTALL_NODE
-
-SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
-RUN apk add --update-cache --no-cache --virtual .build-deps wget && \
-    apk add --update-cache --no-cache \
-    git \
-    bash \
-    make \
-    ca-certificates \
-    libc6-compat \
-    libstdc++ && \
-    wget --quiet "${DOCKER_HUGO_URL}" && \
-    wget --quiet "${DOCKER_HUGO_CHECKSUM_URL}" && \
-    grep "${DOCKER_HUGO_NAME}.tar.gz" "./hugo_${DOCKER_HUGO_VERSION}_checksums.txt" | sha256sum -c - && \
-    tar -zxvf "${DOCKER_HUGO_NAME}.tar.gz" && \
-    mv ./hugo /usr/bin/hugo && \
-    hugo version && \
-    apk del .build-deps && \
-    if [ "${INSTALL_NODE}" = "true" ]; then \
-        echo "Installing Node.js and npm..." && \
-        apk add --no-cache nodejs npm && \
-        npm i -g npm && \
-        npm cache clean --force && \
-        echo "node version: $(node -v)" && \
-        echo "npm version: $(npm -v)"; \
-    fi && \
-    rm -rf /build
-
-ENTRYPOINT [ "/usr/bin/hugo" ]
-
+# [Optional] Uncomment if you want to install more global node packages
+# RUN sudo -u node npm install -g <your-package-list-here>
