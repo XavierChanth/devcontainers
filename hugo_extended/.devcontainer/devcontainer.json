@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.202.1/containers/hugo
 {
-	"name": "Hugo (Community)",
+	"name": "Hugo Extended",
 	"build": {
 		"dockerfile": "Dockerfile",
 		"args": {
@@ -15,7 +15,7 @@
 	"settings": {
 		"html.format.templating": true,
 	},
-	
+
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
 		"bungcip.better-toml",

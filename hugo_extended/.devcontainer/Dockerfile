@@ -1,7 +1,7 @@
-ARG NODE_VERSION
+ARG NODE_VERSION=14
 FROM mcr.microsoft.com/vscode/devcontainers/javascript-node:0-${NODE_VERSION}
-ARG VARIANT
-ARG VERSION
+ARG VARIANT=hugo_extended
+ARG VERSION=latest
 
 # Download Hugo
 RUN apt-get update && apt-get install -y ca-certificates openssl git curl && \
