@@ -10,6 +10,8 @@
     }
   },
   "settings": {},
+  "postCreateCommand": "adb kill-server && adb start-server",
+  "initializeCommand": "adb tcpip 5555",
   "extensions": ["dart-code.dart-code", "dart-code.flutter"],
   "forwardPorts": [5554, 5555, 5556, 5557, 5558, 5559, 6000],
   "remoteUser": "user"
